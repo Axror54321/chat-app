@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oddiy Chat</title>
+</head>
+<body>
+
+<h2>💬 Oddiy Chat</h2>
+
+<div id="chat" style="border:1px solid black; height:300px; overflow:auto; padding:10px;"></div>
+
+<input id="msg" placeholder="xabar yoz...">
+<button onclick="sendMsg()">Yuborish</button>
+
+<script>
+async function load(){
+    let res = await fetch("/messages");
+    let data = await res.json();
+
+    let chat = document.getElementById("chat");
+    chat.innerHTML = "";
+
+    for(let m of data){
+        chat.innerHTML += "<p>" + m + "</p>";
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMsg(){
+    let msg = document.getElementById("msg").value;
+    if(msg === "") return;
+
+    await fetch("/send", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: msg})
+    });
+
+    document.getElementById("msg").value = "";
+    load();
+}
+
+setInterval(load, 2000);
+load();
+</script>
+
+</body>
+</html>
